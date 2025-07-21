@@ -51,7 +51,7 @@ export default function EditBusinessCardPage() {
     branch_address_th: "168 หมู่ 2 ตำบลคลองสวน",
     branch_address_en: "168 M.2 Baanklongsuan,Phrasamutjede,Samutprakarn 10290 Thailand",
     tel: "",
-    company_tel: "02-461-6291",
+    company_tel: "02-461-6288-89",
     fax: "02-461-6292",
     email: "",
     website: "",
@@ -111,7 +111,7 @@ export default function EditBusinessCardPage() {
 
         // ถ้าข้อมูลที่ได้มาไม่มีฟิลด์ใหม่ ให้เพิ่มค่าเริ่มต้น
         if (!data.branch) data.branch = "Branch 1"
-        if (!data.company_tel) data.company_tel = "02-461-6291"
+        if (!data.company_tel) data.company_tel = "02-461-6288-89"
         if (!data.branch_address_th) data.branch_address_th = "168 หมู่ 2 ตำบลคลองสวน"
         if (!data.address_en)
           data.address_en = "382 M.4 Baanklongsuan, Phrasamutjede,Samutprakarn 10290 Thailand"
@@ -209,7 +209,7 @@ export default function EditBusinessCardPage() {
               value={businessCard.name_th}
               onChange={handleChange}
               className="mt-1"
-              placeholder="อธิจิต หงส์กิตติกุล"
+              placeholder=""
             />
           </div>
 
@@ -221,7 +221,7 @@ export default function EditBusinessCardPage() {
               value={businessCard.name_en}
               onChange={handleChange}
               className="mt-1"
-              placeholder="Athijit Hongkittikul"
+              placeholder=""
             />
           </div>
 
@@ -306,7 +306,7 @@ export default function EditBusinessCardPage() {
               value={businessCard.company_tel}
               onChange={handleChange}
               className="mt-1"
-              placeholder="02-461-6291"
+              placeholder="02-461-6288-89"
             />
           </div>
 
