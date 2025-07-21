@@ -242,44 +242,28 @@ export default function BookingHistory() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <div className="text-sm text-muted-foreground">เลขไมล์เริ่มต้น</div>
-                    <div className="font-medium">{booking.startMileage.toLocaleString()} กม.</div>
+                    <div className="text-sm text-muted-foreground">ระยะทาง</div>
+                    <div className="font-medium">{booking.mileageDiff.toLocaleString()} กม.</div>
                   </div>
-                  <div>
-                    <div className="text-sm text-muted-foreground">เลขไมล์สิ้นสุด</div>
-                    <div className="font-medium">{booking.endMileage.toLocaleString()} กม.</div>
+                  <div className="flex justify-end">
+                    <Link href={`/admin/booking-history/${booking.id}`}>
+                      <Button variant="outline" size="sm">
+                        ดูรายละเอียด
+                      </Button>
+                    </Link>
                   </div>
-                </div>
-
-                <div className="mt-3 p-2 bg-muted/50 rounded-md">
-                  <div className="text-sm font-medium">ระยะทางที่ใช้: {booking.mileageDiff.toLocaleString()} กม.</div>
-                  {booking.fuelLevel && (
-                    <div className="text-sm mt-1">
-                      <span className="text-muted-foreground">ระดับน้ำมัน:</span> {booking.fuelLevel}
-                    </div>
-                  )}
-                  {booking.notes && (
-                    <div className="text-sm mt-1">
-                      <span className="text-muted-foreground">หมายเหตุ:</span> {booking.notes}
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-4">
-                  <Link href={`/admin/booking-history/${booking.id}`}>
-                    <Button variant="outline" className="w-full md:w-auto">
-                      ดูรายละเอียดเพิ่มเติม
-                    </Button>
-                  </Link>
                 </div>
               </CardContent>
             </Card>
           ))
         ) : (
           <Card>
-            <CardHeader>
-              <CardTitle className="text-center text-muted-foreground">ไม่พบประวัติการจองที่ตรงกับเงื่อนไขการค้นหา</CardTitle>
-            </CardHeader>
+            <CardContent className="py-8 text-center">
+              <div className="flex flex-col items-center gap-2">
+                <AlertCircle className="h-8 w-8 text-muted-foreground" />
+                <p>ไม่พบข้อมูลประวัติการจอง</p>
+              </div>
+            </CardContent>
           </Card>
         )}
       </div>
