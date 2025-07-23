@@ -3,20 +3,37 @@ import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import { verify } from "jsonwebtoken"
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
-    // ตรวจสอบสิทธิ์การเข้าถึง
-    const cookieStore = cookies()
-    const token = cookieStore.get("auth_token")
-
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
-    // ตรวจสอบความถูกต้องของ token
-    const decoded = verify(token.value, process.env.JWT_SECRET || "your-secret-key") as {
-      id: number
-      role: string
+    // ตรวจสอบ Authorization header ก่อน
+    const authHeader = request.headers.get("Authorization")
+    let tokenValue = null;
+    let decoded;
+    
+    // ถ้ามี Authorization header ให้ใช้ token จาก header
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      tokenValue = authHeader.substring(7)
+      decoded = verify(tokenValue, process.env.JWT_SECRET || "your-secret-key") as {
+        id: number
+        role: string
+      }
+    } else {
+      // ถ้าไม่มี Authorization header ให้ดึง token จาก cookie
+      const cookieStore = cookies()
+      const token = cookieStore.get("auth_token")
+      
+      if (!token) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      }
+      
+      // ตรวจสอบความถูกต้องของ token
+      tokenValue = token.value
+      decoded = verify(tokenValue, process.env.JWT_SECRET || "your-secret-key") as {
+        id: number
+        role: string
+      }
     }
 
     // รับพารามิเตอร์จาก URL

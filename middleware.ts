@@ -1,42 +1,33 @@
-import { NextResponse } from "next/server"
-import type { NextRequest } from "next/server"
-import { publicRoutes } from "./middleware.config"
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
-  const token = request.cookies.get("auth_token")?.value
-
-  // Allow access to public routes
-  if (
-    publicRoutes.some((route) => pathname.startsWith(route)) ||
-    pathname.startsWith("/share/business-card/") // เพิ่มเส้นทางสำหรับแชร์นามบัตร
-  ) {
-    return NextResponse.next()
+  // ตรวจสอบว่ามี auth_token ใน cookie หรือไม่
+  const token = request.cookies.get('auth_token')
+  
+  console.log('Middleware - Token found:', token ? 'Yes' : 'No')
+  if (token) {
+    console.log('Middleware - Token value:', token.value.substring(0, 10) + '...')
   }
-
-  // Check if user is trying to access admin routes
-  if (pathname.startsWith("/admin")) {
-    if (!token) {
-      return NextResponse.redirect(new URL("/login", request.url))
-    }
-
-    // Additional admin role check can be added here if needed
-    return NextResponse.next()
+  
+  // ถ้ามี token ใน cookie ให้เพิ่ม Authorization header
+  if (token) {
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set('Authorization', `Bearer ${token.value}`)
+    console.log('Middleware - Setting Authorization header')
+    
+    // สร้าง response ใหม่ที่มี header ที่ต้องการ
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    })
   }
-
-  // Check if user is trying to access user routes
-  if (pathname.startsWith("/user")) {
-    if (!token) {
-      return NextResponse.redirect(new URL("/login", request.url))
-    }
-
-    return NextResponse.next()
-  }
-
-  // Default behavior for other routes
+  
   return NextResponse.next()
 }
 
+// ระบุ path ที่ต้องการให้ middleware ทำงาน
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|images).*)"],
+  matcher: ['/api/:path*'],
 }

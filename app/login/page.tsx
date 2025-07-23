@@ -48,10 +48,12 @@ export default function Login() {
       console.log("Attempting login with:", { email })
 
       // ส่งคำขอไปยัง API เพื่อตรวจสอบข้อมูลผู้ใช้
+      console.log("Sending login request to API")
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Cache-Control": "no-cache"
         },
         body: JSON.stringify({ email, password }),
         credentials: "include", // ให้แน่ใจว่าจะรับ cookie กลับมา
@@ -63,6 +65,12 @@ export default function Login() {
 
       if (!response.ok) {
         throw new Error(data.error || "เกิดข้อผิดพลาดในการเข้าสู่ระบบ")
+      }
+
+      // บันทึก token ที่ได้รับจาก API ลงใน localStorage เพื่อใช้ในการเรียก API อื่นๆ
+      if (data.token) {
+        console.log("Saving token to localStorage")
+        localStorage.setItem("auth_token", data.token)
       }
 
       // นำทางไปยังหน้าที่เหมาะสมตามบทบาทของผู้ใช้  
