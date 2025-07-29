@@ -3,20 +3,38 @@ import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import { verify } from "jsonwebtoken"
 
-export async function GET() {
+export const dynamic = 'force-dynamic';
+
+export async function GET(request: Request) {
   try {
-    // ดึง token จาก cookie
-    const cookieStore = cookies()
-    const token = cookieStore.get("auth_token")
-
-    console.log("ME API - Token found:", token ? "Yes" : "No")
-
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    // ตรวจสอบ Authorization header ก่อน
+    const authHeader = request.headers.get("Authorization")
+    console.log("ME API - Authorization header:", authHeader ? "Present" : "Not present")
+    
+    let tokenValue = null;
+    
+    // ถ้ามี Authorization header ให้ใช้ token จาก header
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      tokenValue = authHeader.substring(7)
+      console.log("ME API - Using token from Authorization header")
+    } else {
+      // ถ้าไม่มี Authorization header ให้ดึง token จาก cookie
+      const cookieStore = cookies()
+      const token = cookieStore.get("auth_token")
+      console.log("ME API - Token found in cookie:", token ? "Yes" : "No")
+      
+      if (token) {
+        tokenValue = token.value
+        console.log("ME API - Using token from cookie")
+      }
+    }
+    
+    if (!tokenValue) {
+      return NextResponse.json({ error: "Unauthorized - No token found" }, { status: 401 })
     }
 
     // ตรวจสอบความถูกต้องของ token
-    const decoded = verify(token.value, process.env.JWT_SECRET || "your-secret-key") as {
+    const decoded = verify(tokenValue, process.env.JWT_SECRET || "your-secret-key") as {
       id: number
     }
 

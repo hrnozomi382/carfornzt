@@ -78,15 +78,39 @@ export default function UserDashboard() {
   useEffect(() => {
     async function fetchUserData() {
       try {
-        const response = await fetch("/api/auth/me")
-        if (!response.ok) {
-          throw new Error("Failed to fetch user data")
+        console.log("Dashboard - Fetching user data")
+        
+        // ดึง token จาก localStorage ถ้ามี
+        let authHeader = {}
+        if (typeof window !== "undefined") {
+          const token = localStorage.getItem("auth_token")
+          if (token) {
+            console.log("Dashboard - Found token in localStorage")
+            authHeader = {
+              "Authorization": `Bearer ${token}`
+            }
+          }
         }
+        
+        const response = await fetch("/api/auth/me", {
+          headers: {
+            "Cache-Control": "no-cache",
+            ...authHeader
+          },
+          credentials: "include" // ส่ง cookies ไปด้วย
+        })
+        
+        console.log("Dashboard - ME API response status:", response.status)
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch user data: ${response.status}`)
+        }
+        
         const userData = await response.json()
         setUser(userData)
-        console.log("User data:", userData)
+        console.log("Dashboard - User data:", userData)
       } catch (error) {
-        console.error("Error fetching user data:", error)
+        console.error("Dashboard - Error fetching user data:", error)
         // หากไม่สามารถดึงข้อมูลผู้ใช้ได้ ให้นำทางกลับไปยังหน้าเข้าสู่ระบบ
         router.push("/login")
       } finally {

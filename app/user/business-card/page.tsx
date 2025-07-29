@@ -92,7 +92,7 @@ export default function BusinessCardPage() {
 
         // ถ้าข้อมูลที่ได้มาไม่มีฟิลด์ใหม่ ให้เพิ่มค่าเริ่มต้น
         if (!data.branch) data.branch = "สำนักงานใหญ่"
-        if (!data.company_tel) data.company_tel = "02-461-6291"
+        if (!data.company_tel) data.company_tel = "02-461-6288-89"
         if (!data.branch_address_th) data.branch_address_th = "168 หมู่ 2 ตำบลคลองสวน"
         if (!data.branch_address_en)
           data.branch_address_en = "168 M.2 Baanklongsuan, Phrasamutjede, Samutprakarn 10290 Thailand"
