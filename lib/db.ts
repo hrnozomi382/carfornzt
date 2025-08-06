@@ -1,30 +1,26 @@
-// Dynamic database import based on environment
+import mysql from "mysql2/promise"
+
+// Check environment to determine database type
 const isVercel = process.env.VERCEL === '1'
 const usePostgres = process.env.POSTGRES_URL !== undefined
 
 if (isVercel && usePostgres) {
   // Use Vercel Postgres
-  const { executeQuery, executeQuerySingle, executeInsert } = await import('./vercel-db')
-  export { executeQuery, executeQuerySingle, executeInsert }
-} else if (isVercel || process.env.NODE_ENV === 'production') {
-  // Use production MySQL with SSL
-  const { executeQuery, executeQuerySingle, executeInsert } = await import('./db-production')
-  export { executeQuery, executeQuerySingle, executeInsert }
+  export * from './vercel-db'
 } else {
-  // Use local MySQL for development
-  const mysql = await import('mysql2/promise')
-  
+  // Use MySQL (local or production)
   const dbConfig = {
     host: process.env.DB_HOST || "localhost",
     user: process.env.DB_USER || "root",
     password: process.env.DB_PASSWORD || "",
     database: process.env.DB_NAME || "carbookingsystem",
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
     waitForConnections: true,
     connectionLimit: 5,
     queueLimit: 0,
   }
   
-  let pool: any = null
+  let pool: mysql.Pool | null = null
   
   async function getPool() {
     if (!pool) {
@@ -34,7 +30,7 @@ if (isVercel && usePostgres) {
           user: dbConfig.user,
           database: dbConfig.database,
         })
-        pool = mysql.default.createPool(dbConfig)
+        pool = mysql.createPool(dbConfig)
         
         const connection = await pool.getConnection()
         connection.release()
