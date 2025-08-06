@@ -9,9 +9,9 @@ const dbConfig = {
   waitForConnections: true,
   connectionLimit: 5,
   queueLimit: 0,
-  acquireTimeout: 60000,
-  timeout: 60000,
-  reconnect: true,
+  authPlugins: {
+    mysql_native_password: () => require('mysql2/lib/auth_plugins/mysql_native_password'),
+  },
 }
 
 // สร้าง pool connection

@@ -3,13 +3,16 @@ const path = require('path');
 
 const nextConfig = {
   output: 'standalone',
+  reactStrictMode: false,
+  swcMinify: true,
+  experimental: {
+    esmExternals: false,
+  },
   webpack: (config, { isServer }) => {
-    // ตั้งค่า case-sensitive-paths-webpack-plugin เป็น false
     config.plugins = config.plugins.filter(
       (plugin) => plugin.constructor.name !== 'CaseSensitivePathsPlugin'
     );
     
-    // เพิ่มการกำหนดค่า resolve.alias ถ้าจำเป็น
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': path.resolve(__dirname, './')
