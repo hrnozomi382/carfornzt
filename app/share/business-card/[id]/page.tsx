@@ -303,7 +303,7 @@ export default function SharedBusinessCardPage() {
 
                 {/* QR Code */}
                 <div className="absolute bottom-2 right-2 flex flex-col items-center">
-                  <QRCode value={shareUrl} size={60} renderAs="svg" includeMargin={false} />
+                  <QRCode value={shareUrl} size={60} includeMargin={false} />
                   <div className="text-[8px] text-green-600 font-semibold mt-0.5">Scan to view</div>
                 </div>
               </div>
@@ -423,7 +423,7 @@ export default function SharedBusinessCardPage() {
 
               {/* QR Code */}
               <div className="absolute bottom-4 right-4 flex flex-col items-center">
-                <QRCode value={shareUrl} size={120} renderAs="svg" includeMargin={false} />
+                <QRCode value={shareUrl} size={120} includeMargin={false} />
                 <div className="text-base text-green-600 font-semibold mt-1">Scan to view</div>
               </div>
             </div>

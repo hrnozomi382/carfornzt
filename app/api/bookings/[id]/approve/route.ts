@@ -23,11 +23,12 @@ export async function POST(request: Request, { params }: { params: { id: string 
       [bookingId],
     )
 
-    if (checkBooking.recordset.length === 0) {
+    const records = Array.isArray(checkBooking) ? checkBooking : (checkBooking as any)?.recordset || [];
+    if (records.length === 0) {
       return NextResponse.json({ error: "Booking not found" }, { status: 404 })
     }
 
-    const booking = checkBooking.recordset[0]
+    const booking = records[0]
 
     // ตรวจสอบว่าการจองอยู่ในสถานะรออนุมัติหรือไม่
     if (booking.status !== "รออนุมัติ") {

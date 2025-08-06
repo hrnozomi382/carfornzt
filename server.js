@@ -7,7 +7,7 @@ const handle = app.getRequestHandler();
 
 // ใช้พอร์ตจาก environment variable หรือใช้ค่าเริ่มต้น 3000
 const port = process.env.PORT || 3000;
-const hostname = process.env.HOSTNAME || '0.0.0.0';
+const hostname = process.env.HOSTNAME || 'localhost';
 
 app.prepare().then(() => {
   createServer((req, res) => {

@@ -24,7 +24,8 @@ export async function GET() {
     )
 
     // แปลงข้อมูลให้อยู่ในรูปแบบที่เหมาะสม
-    const bookingHistory = result.recordset.map((booking: any) => {
+    const records = Array.isArray(result) ? result : (result as any)?.recordset || [];
+    const bookingHistory = records.map((booking: any) => {
       return {
         id: booking.id,
         startDate: booking.startDate,

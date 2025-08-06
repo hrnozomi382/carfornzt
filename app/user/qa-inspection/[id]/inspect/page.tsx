@@ -16,6 +16,7 @@ interface ChecklistItem {
   name: string
   description: string
   isRequired: boolean
+  sortOrder?: number
 }
 
 interface Tool {

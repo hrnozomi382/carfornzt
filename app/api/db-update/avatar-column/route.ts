@@ -14,7 +14,8 @@ export async function GET() {
       [],
     )
 
-    const columnExists = (checkColumnResult.recordset[0] as any).count > 0
+    const checkRecords = Array.isArray(checkColumnResult) ? checkColumnResult : (checkColumnResult as any)?.recordset || [];
+    const columnExists = checkRecords.length > 0 && checkRecords[0].count > 0
 
     if (columnExists) {
       return NextResponse.json({ message: "Column avatar_url already exists in Users table" })

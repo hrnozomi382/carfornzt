@@ -38,7 +38,7 @@ export async function POST(request: Request) {
       [toolId, decoded.id, generalNotes]
     )
 
-    const inspectionId = inspectionResult.insertId || inspectionResult.recordset?.insertId
+    const inspectionId = (inspectionResult as any)?.insertId || (inspectionResult as any)?.recordset?.insertId
 
     // บันทึกผลการตรวจเช็คแต่ละรายการ
     for (const [itemId, result] of Object.entries(results)) {
@@ -79,7 +79,7 @@ export async function GET() {
       ORDER BY i.createdAt DESC
     `)
 
-    const inspectionsArray = Array.isArray(inspections) ? inspections : inspections.recordset || []
+    const inspectionsArray = Array.isArray(inspections) ? inspections : (inspections as any)?.recordset || []
     return NextResponse.json(inspectionsArray)
   } catch (error) {
     console.error("Error fetching inspections:", error)

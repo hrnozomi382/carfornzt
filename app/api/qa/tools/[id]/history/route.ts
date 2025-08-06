@@ -25,10 +25,10 @@ export async function GET(
       ORDER BY i.inspectionDate DESC
     `, [toolId])
 
-    const inspectionsArray = Array.isArray(inspections) ? inspections : inspections.recordset || []
+    const inspectionsArray = Array.isArray(inspections) ? inspections : (inspections as any)?.recordset || []
 
     const historyWithResults = await Promise.all(
-      inspectionsArray.map(async (inspection) => {
+      inspectionsArray.map(async (inspection: any) => {
         const results = await executeQuery(`
           SELECT 
             r.result,
@@ -40,7 +40,7 @@ export async function GET(
           ORDER BY c.sortOrder
         `, [inspection.id])
 
-        const resultsArray = Array.isArray(results) ? results : results.recordset || []
+        const resultsArray = Array.isArray(results) ? results : (results as any)?.recordset || []
 
         return {
           ...inspection,

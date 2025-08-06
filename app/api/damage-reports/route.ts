@@ -46,7 +46,7 @@ export async function GET(request: Request) {
       ORDER BY b.createdAt DESC
     `)
     
-    const reportsArray = Array.isArray(reports) ? reports : reports.recordset || []
+    const reportsArray = Array.isArray(reports) ? reports : (reports as any)?.recordset || []
     console.log('Found reports:', reportsArray.length, reportsArray)
     return NextResponse.json(reportsArray)
   } catch (error) {

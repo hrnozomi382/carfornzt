@@ -13,7 +13,8 @@ export async function GET() {
       [],
     )
 
-    return NextResponse.json(result.recordset)
+    const records = Array.isArray(result) ? result : (result as any)?.recordset || [];
+    return NextResponse.json(records)
   } catch (error) {
     console.error("Error fetching car types:", error)
     return NextResponse.json({ error: "Failed to fetch car types" }, { status: 500 })
@@ -38,7 +39,8 @@ export async function POST(request: Request) {
       [name],
     )
 
-    if ((existingType.recordset[0] as any).count > 0) {
+    const existingRecords = Array.isArray(existingType) ? existingType : (existingType as any)?.recordset || [];
+    if (existingRecords.length > 0 && existingRecords[0].count > 0) {
       return NextResponse.json({ error: "Car type name already exists" }, { status: 409 })
     }
 

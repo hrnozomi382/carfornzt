@@ -18,7 +18,8 @@ export async function GET() {
       [],
     )
 
-    return NextResponse.json(result.recordset)
+    const records = Array.isArray(result) ? result : (result as any)?.recordset || [];
+    return NextResponse.json(records)
   } catch (error) {
     console.error("Error fetching bookings:", error)
     return NextResponse.json({ error: "Failed to fetch bookings" }, { status: 500 })
@@ -51,7 +52,8 @@ export async function POST(request: Request) {
       [carId, startDate, startDate, endDate, endDate, startDate, endDate],
     )
 
-    if ((conflictingBookings.recordset[0] as any).count > 0) {
+    const conflictRecords = Array.isArray(conflictingBookings) ? conflictingBookings : (conflictingBookings as any)?.recordset || [];
+    if (conflictRecords.length > 0 && conflictRecords[0].count > 0) {
       return NextResponse.json({ error: "Car is not available for the selected dates" }, { status: 409 })
     }
 

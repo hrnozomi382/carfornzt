@@ -39,10 +39,11 @@ export async function POST(request: Request, { params }: { params: { id: string 
     // ตรวจสอบว่า activeBookingsResult มีค่าและมี property count หรือไม่
     let carUpdated = false
 
-    if (activeBookingsResult && activeBookingsResult.recordset && activeBookingsResult.recordset[0]) {
-      console.log(`Active bookings count for car ID ${carId}: ${activeBookingsResult.recordset[0].count}`)
+    const activeRecords = Array.isArray(activeBookingsResult) ? activeBookingsResult : (activeBookingsResult as any)?.recordset || [];
+    if (activeRecords.length > 0) {
+      console.log(`Active bookings count for car ID ${carId}: ${activeRecords[0].count}`)
 
-      if (activeBookingsResult.recordset[0].count === 0) {
+      if (activeRecords[0].count === 0) {
         console.log(`No active bookings found for car ID: ${carId}, updating status to "ว่าง"`)
         await executeQuery(`UPDATE Cars SET status = 'ว่าง' WHERE id = ?`, [carId])
         carUpdated = true

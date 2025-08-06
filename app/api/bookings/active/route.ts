@@ -20,10 +20,11 @@ export async function GET() {
       [],
     )
 
-    console.log("Active bookings found:", result.recordset.length)
+    const records = Array.isArray(result) ? result : (result as any)?.recordset || [];
+    console.log("Active bookings found:", records.length)
 
     // แปลงข้อมูลให้อยู่ในรูปแบบที่เหมาะสม
-    const activeBookings = result.recordset.map((booking: any) => {
+    const activeBookings = records.map((booking: any) => {
       // ตรวจสอบและแปลงค่า startMileage ให้เป็นตัวเลข
       const startMileage =
         booking.startMileage !== null && booking.startMileage !== undefined

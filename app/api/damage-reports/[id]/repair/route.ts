@@ -15,8 +15,9 @@ export async function POST(
       [bookingId]
     )
     
-    if (booking.length > 0) {
-      const bookingData = Array.isArray(booking) ? booking[0] : booking.recordset[0]
+    const bookingRecords = Array.isArray(booking) ? booking : (booking as any)?.recordset || [];
+    if (bookingRecords.length > 0) {
+      const bookingData = bookingRecords[0]
       
       // Create maintenance record
       await executeQuery(

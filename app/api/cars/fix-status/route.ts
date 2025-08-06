@@ -6,7 +6,8 @@ export async function POST(request: Request) {
     console.log("Starting car status fix process")
 
     // 1. ดึงข้อมูลรถทั้งหมด
-    const cars = await executeQuery(`SELECT id, status FROM Cars`)
+    const carsResult = await executeQuery(`SELECT id, status FROM Cars`)
+    const cars = Array.isArray(carsResult) ? carsResult : (carsResult as any)?.recordset || [];
     console.log(`Found ${cars.length} cars to check`)
 
     let updatedCars = 0
@@ -19,11 +20,8 @@ export async function POST(request: Request) {
         [car.id],
       )
 
-      const hasActiveBookings =
-        activeBookings &&
-        activeBookings.recordset &&
-        activeBookings.recordset[0] &&
-        activeBookings.recordset[0].count > 0
+      const activeRecords = Array.isArray(activeBookings) ? activeBookings : (activeBookings as any)?.recordset || [];
+      const hasActiveBookings = activeRecords.length > 0 && activeRecords[0].count > 0
       console.log(`Car ID: ${car.id}, Status: ${car.status}, Has active bookings: ${hasActiveBookings}`)
 
       // ถ้ารถมีสถานะ "ไม่ว่าง" แต่ไม่มีการจองที่มีสถานะ "อนุมัติแล้ว" หรือ "รออนุมัติ"

@@ -25,8 +25,9 @@ export async function POST(request: Request, { params }: { params: { id: string 
     let newStatus = "ว่าง"
     let hasActiveBookings = false
 
-    if (activeBookingsResult && activeBookingsResult.recordset && activeBookingsResult.recordset[0]) {
-      const activeBookingsCount = activeBookingsResult.recordset[0].count
+    const activeRecords = Array.isArray(activeBookingsResult) ? activeBookingsResult : (activeBookingsResult as any)?.recordset || [];
+    if (activeRecords.length > 0) {
+      const activeBookingsCount = activeRecords[0].count
       console.log(`Active bookings count for car ID ${carId}: ${activeBookingsCount}`)
 
       if (activeBookingsCount > 0) {

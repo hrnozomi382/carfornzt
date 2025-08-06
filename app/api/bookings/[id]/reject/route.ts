@@ -15,11 +15,12 @@ export async function POST(request: Request, { params }: { params: { id: string 
       [bookingId],
     )
 
-    if (checkBooking.recordset.length === 0) {
+    const records = Array.isArray(checkBooking) ? checkBooking : (checkBooking as any)?.recordset || [];
+    if (records.length === 0) {
       return NextResponse.json({ error: "Booking not found" }, { status: 404 })
     }
 
-    const booking = checkBooking.recordset[0]
+    const booking = records[0]
 
     // ตรวจสอบว่าการจองอยู่ในสถานะรออนุมัติหรือไม่
     if (booking.status !== "รออนุมัติ") {
@@ -47,7 +48,8 @@ export async function POST(request: Request, { params }: { params: { id: string 
     )
 
     // ถ้าไม่มีการจองอื่นที่อนุมัติแล้ว ให้อัปเดตสถานะรถเป็น 'ว่าง'
-    if (checkOtherBookings.recordset[0].count === 0) {
+    const otherRecords = Array.isArray(checkOtherBookings) ? checkOtherBookings : (checkOtherBookings as any)?.recordset || [];
+    if (otherRecords.length > 0 && otherRecords[0].count === 0) {
       await executeQuery(
         `
         UPDATE Cars SET status = 'ว่าง' WHERE id = ?
