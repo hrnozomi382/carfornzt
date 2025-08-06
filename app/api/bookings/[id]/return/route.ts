@@ -16,9 +16,15 @@ export async function POST(request: Request, { params }: { params: { id: string 
 
     // แปลงข้อมูลให้เป็นรูปแบบที่ถูกต้อง
     const endMileage = Number.parseInt(data.endMileage, 10)
+    const carCondition = data.carCondition || 'ปกติ'
     const notes = data.notes || null
     const fuelLevel = data.fuelLevel || null
     const fuelCost = data.fuelCost ? Number.parseFloat(data.fuelCost) : null
+    
+    // สร้าง notes ที่รวมข้อมูลสภาพรถ
+    const finalNotes = carCondition === 'ไม่ปกติ' && notes 
+      ? `สภาพรถ: ${carCondition} - ${notes}` 
+      : notes
 
     console.log("Parsed return car data:", { bookingId, endMileage, notes, fuelLevel, fuelCost })
 
@@ -45,7 +51,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     console.log("Found booking:", booking)
 
     // ตรวจสอบว่าการจองอยู่ในสถานะที่ถูกต้อง
-    if (booking.status !== "อนุมัติแล้ว") {
+    if (booking.status !== "อนุมัติแล้ว" && booking.status !== "รอคืนรถ") {
       return NextResponse.json({ error: "การจองนี้ไม่อยู่ในสถานะที่สามารถคืนรถได้" }, { status: 400 })
     }
 
@@ -79,7 +85,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
         fuelCost = ?
       WHERE id = ?
       `,
-      [endMileage, mileageDiff, notes, fuelLevel, fuelCost, bookingId],
+      [endMileage, mileageDiff, finalNotes, fuelLevel, fuelCost, bookingId],
     )
 
     console.log("Updating car status and mileage:", {

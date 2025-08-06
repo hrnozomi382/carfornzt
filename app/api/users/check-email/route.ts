@@ -4,8 +4,6 @@ import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import { verify } from "jsonwebtoken"
 
-export const dynamic = 'force-dynamic';
-
 export async function GET(request: Request) {
   try {
     // ตรวจสอบ Authorization header ก่อน

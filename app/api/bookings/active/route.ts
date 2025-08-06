@@ -8,13 +8,13 @@ export async function GET() {
       `
       SELECT 
         b.id, b.userId, b.carId, b.startDate, b.endDate, b.startTime, b.endTime, 
-        b.purpose, b.destination, b.status, b.startMileage, b.createdAt,
+        b.purpose, b.destination, b.status, b.startMileage, b.endMileage, b.fuelLevel, b.notes, b.createdAt,
         u.name as userName, u.department, u.email, u.phone, u.avatar as profileImage,
         c.name as carName, c.licensePlate, c.currentMileage, c.type as carTypeName
       FROM Bookings b
       JOIN Users u ON b.userId = u.id
       JOIN Cars c ON b.carId = c.id
-      WHERE b.status = 'อนุมัติแล้ว' AND b.endMileage IS NULL
+      WHERE (b.status = 'อนุมัติแล้ว' AND b.endMileage IS NULL) OR b.status = 'รอคืนรถ'
       ORDER BY b.startDate ASC, b.startTime ASC
       `,
       [],
@@ -44,6 +44,9 @@ export async function GET() {
         destination: booking.destination || null,
         status: booking.status,
         startMileage: startMileage,
+        endMileage: booking.endMileage ? Number.parseInt(booking.endMileage, 10) : null,
+        fuelLevel: booking.fuelLevel || null,
+        notes: booking.notes || null,
         user: {
           name: booking.userName,
           department: booking.department,

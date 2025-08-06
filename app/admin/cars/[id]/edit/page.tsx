@@ -36,13 +36,9 @@ interface CarType {
 // const carTypes = ["รถเก๋ง", "รถอเนกประสงค์", "รถตู้", "รถกระบะ", "รถมินิบัส"]
 
 // เปลี่ยนเป็นการดึงข้อมูลจาก API
-// เพิ่ม state สำหรับเก็บข้อมูลประเภทรถ
-const [carTypeOptions, setCarTypeOptions] = useState<{ id: number; name: string }[]>([])
-
-// Mock data for car types
-// const carTypes = ["รถเก๋ง", "รถอเนกประสงค์", "รถตู้", "รถกระบะ", "รถมินิบัส"]
-
 export default function EditCar({ params }: { params: { id: string } }) {
+  // เพิ่ม state สำหรับเก็บข้อมูลประเภทรถ
+  const [carTypeOptions, setCarTypeOptions] = useState<{ id: number; name: string }[]>([])
   const router = useRouter()
   const [car, setCar] = useState<CarType | null>(null)
   const [loading, setLoading] = useState(true)

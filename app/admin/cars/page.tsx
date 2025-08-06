@@ -574,7 +574,7 @@ export default function CarsManagement() {
         </div>
 
         <div className="flex gap-2">
-          <Select value={filterType} onValueChange={setFilterType} className="flex-1">
+          <Select value={filterType} onValueChange={setFilterType}>
             <SelectTrigger>
               <div className="flex items-center">
                 <Filter className="mr-2 h-4 w-4" />
@@ -807,11 +807,9 @@ export default function CarsManagement() {
                     </div>
                   </div>
                   <div className="text-sm text-muted-foreground mt-2">ทะเบียน: {car.licensePlate}</div>
-                  {car.initialMileage !== undefined && (
-                    <div className="text-sm text-muted-foreground mt-1">
-                      เลขไมล์ล่าสุด: {car.currentMileage.toLocaleString()} กม.
-                    </div>
-                  )}
+                  <div className="text-sm text-muted-foreground mt-1">
+                    เลขไมล์ล่าสุด: {car.currentMileage.toLocaleString()} กม.
+                  </div>
                 </CardContent>
               </Card>
             </Link>

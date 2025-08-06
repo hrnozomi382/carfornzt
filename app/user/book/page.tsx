@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { format } from "date-fns"
+import { th } from "date-fns/locale"
 import { CalendarIcon, Car, ChevronLeft, Info, Clock } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useMediaQuery } from "@/hooks/use-mobile"
@@ -410,7 +411,7 @@ export default function BookCar() {
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {startDate ? format(startDate, "PPP") : "เลือกวันที่"}
+                        {startDate ? format(startDate, "d MMMM yyyy", { locale: th }) : "เลือกวันที่"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
@@ -419,6 +420,7 @@ export default function BookCar() {
                         selected={startDate}
                         onSelect={setStartDate}
                         initialFocus
+                        locale={th}
                         disabled={(date) => {
                           // ตรวจสอบเฉพาะวันที่ในอดีตโดยเปรียบเทียบเฉพาะวัน เดือน ปี (ไม่รวมเวลา)
                           const today = new Date()
@@ -443,7 +445,7 @@ export default function BookCar() {
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {endDate ? format(endDate, "PPP") : "เลือกวันที่"}
+                        {endDate ? format(endDate, "d MMMM yyyy", { locale: th }) : "เลือกวันที่"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
@@ -452,6 +454,7 @@ export default function BookCar() {
                         selected={endDate}
                         onSelect={setEndDate}
                         initialFocus
+                        locale={th}
                         disabled={(date) => {
                           // ตรวจสอบเฉพาะวันที่ในอดีตโดยเปรียบเทียบเฉพาะวัน เดือน ปี (ไม่รวมเวลา)
                           const today = new Date()

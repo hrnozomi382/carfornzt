@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Car, Users, FileText, Calendar, LayoutDashboard, LogOut, Menu, RotateCcw, History } from "lucide-react"
+import { Car, Users, FileText, Calendar, LayoutDashboard, LogOut, Menu, RotateCcw, History, Wrench, AlertTriangle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useState } from "react"
@@ -50,6 +50,17 @@ export default function AdminSidebar() {
       href: "/admin/booking-history",
       icon: History,
     },
+    {
+      title: "บันทึกซ่อมบำรุง",
+      href: "/admin/maintenance",
+      icon: Wrench,
+    },
+    {
+      title: "รายการที่แจ้งชำรุด",
+      href: "/admin/damage-reports",
+      icon: AlertTriangle,
+    },
+
   ]
 
   const handleLogout = () => {

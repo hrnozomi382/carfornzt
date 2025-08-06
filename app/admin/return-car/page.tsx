@@ -35,6 +35,9 @@ interface ActiveBooking {
   destination?: string
   status: string
   startMileage: number
+  endMileage?: number
+  fuelLevel?: string
+  notes?: string
   user: {
     name: string
     department: string
@@ -60,6 +63,7 @@ export default function ReturnCar() {
   const [notes, setNotes] = useState("")
   const [fuelLevel, setFuelLevel] = useState("เต็มถัง")
   const [fuelCost, setFuelCost] = useState("")
+  const [carCondition, setCarCondition] = useState("ปกติ")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
   const [activeBookings, setActiveBookings] = useState<ActiveBooking[]>([])
@@ -109,10 +113,11 @@ export default function ReturnCar() {
 
   const handleOpenReturnDialog = (booking: ActiveBooking) => {
     setSelectedBooking(booking)
-    setEndMileage("")
-    setNotes("")
-    setFuelLevel("เต็มถัง")
+    setEndMileage(booking.endMileage ? booking.endMileage.toString() : "")
+    setNotes(booking.notes || "")
+    setFuelLevel(booking.fuelLevel || "เต็มถัง")
     setFuelCost("")
+    setCarCondition("ปกติ")
     setError("")
     setIsReturnDialogOpen(true)
   }
@@ -134,6 +139,11 @@ export default function ReturnCar() {
 
     if (endMileageNum <= selectedBooking.startMileage) {
       setError("เลขไมล์หลังใช้งานต้องมากกว่าเลขไมล์ก่อนใช้งาน")
+      return
+    }
+
+    if (carCondition === "ไม่ปกติ" && !notes.trim()) {
+      setError("กรุณาระบุรายละเอียดเมื่อสภาพรถไม่ปกติ")
       return
     }
 
@@ -160,6 +170,7 @@ export default function ReturnCar() {
           notes,
           fuelLevel,
           fuelCost: fuelCost ? fuelCost : null,
+          carCondition,
         }),
       })
 
@@ -246,7 +257,9 @@ export default function ReturnCar() {
                         <div className="text-xs text-muted-foreground">{booking.user.department}</div>
                       </div>
                     </div>
-                    <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200">กำลังใช้งาน</Badge>
+                    <Badge className={booking.status === 'รอคืนรถ' ? "bg-orange-100 text-orange-800 hover:bg-orange-200" : "bg-blue-100 text-blue-800 hover:bg-blue-200"}>
+                      {booking.status === 'รอคืนรถ' ? 'รอคืนรถ' : 'กำลังใช้งาน'}
+                    </Badge>
                   </div>
 
                   <div className="mt-3 space-y-2">
@@ -268,12 +281,22 @@ export default function ReturnCar() {
                         เลขไมล์เริ่มต้น: <span className="font-medium">{booking.startMileage.toLocaleString()} กม.</span>
                       </span>
                     </div>
+                    
+                    {booking.status === 'รอคืนรถ' && booking.endMileage && (
+                      <div className="mt-2 p-2 bg-blue-50 rounded-md border border-blue-200">
+                        <div className="text-sm font-medium text-blue-800 mb-1">ข้อมูลจาก User:</div>
+                        <div className="text-xs text-blue-700 space-y-1">
+                          <div>เลขไมล์หลังใช้: <span className="font-medium">{booking.endMileage.toLocaleString()} กม.</span></div>
+                          {booking.fuelLevel && <div>ปริมาณน้ำมัน: <span className="font-medium">{booking.fuelLevel}</span></div>}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="mt-4">
                     <Button className="w-full md:w-auto" onClick={() => handleOpenReturnDialog(booking)}>
                       <Check className="mr-2 h-4 w-4" />
-                      บันทึกการคืนรถ
+                      {booking.status === 'รอคืนรถ' ? 'อนุมัติการคืนรถ' : 'บันทึกการคืนรถ'}
                     </Button>
                   </div>
                 </CardContent>
@@ -311,6 +334,16 @@ export default function ReturnCar() {
                 </div>
               </div>
 
+              {selectedBooking.status === 'รอคืนรถ' && selectedBooking.endMileage && (
+                <div className="p-3 bg-blue-50 rounded-md border border-blue-200">
+                  <div className="font-medium text-blue-800 mb-2">ข้อมูลจาก User:</div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>เลขไมล์หลังใช้: <span className="font-medium">{selectedBooking.endMileage.toLocaleString()}</span></div>
+                    {selectedBooking.fuelLevel && <div>ปริมาณน้ำมัน: <span className="font-medium">{selectedBooking.fuelLevel}</span></div>}
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>เลขไมล์ก่อนใช้งาน</Label>
@@ -323,8 +356,8 @@ export default function ReturnCar() {
                   </Label>
                   <Input
                     id="endMileage"
-                    placeholder="ระบุเลขไมล์"
-                    value={endMileage}
+                    placeholder={selectedBooking.endMileage ? selectedBooking.endMileage.toString() : "ระบุเลขไมล์"}
+                    value={endMileage || (selectedBooking.endMileage ? selectedBooking.endMileage.toString() : '')}
                     onChange={(e) => setEndMileage(e.target.value)}
                     className={error ? "border-destructive" : ""}
                   />
@@ -343,6 +376,19 @@ export default function ReturnCar() {
                     </span>
                   </div>
                 )}
+
+              <div className="space-y-2">
+                <Label htmlFor="carCondition">สภาพรถ <span className="text-destructive">*</span></Label>
+                <select
+                  id="carCondition"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  value={carCondition}
+                  onChange={(e) => setCarCondition(e.target.value)}
+                >
+                  <option value="ปกติ">ปกติ</option>
+                  <option value="ไม่ปกติ">ไม่ปกติ</option>
+                </select>
+              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="fuelLevel">ระดับน้ำมันเมื่อคืนรถ</Label>
@@ -371,13 +417,19 @@ export default function ReturnCar() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="notes">หมายเหตุ</Label>
+                <Label htmlFor="notes">
+                  หมายเหตุ {carCondition === "ไม่ปกติ" && <span className="text-destructive">*</span>}
+                </Label>
                 <Textarea
                   id="notes"
-                  placeholder="บันทึกสภาพรถหรือหมายเหตุอื่นๆ (ถ้ามี)"
+                  placeholder={carCondition === "ไม่ปกติ" ? "กรุณาระบุรายละเอียดปัญหาหรือความเสียหาย" : "บันทึกหมายเหตุอื่นๆ (ถ้ามี)"}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
+                  className={carCondition === "ไม่ปกติ" && !notes ? "border-destructive" : ""}
                 />
+                {carCondition === "ไม่ปกติ" && !notes && (
+                  <div className="text-sm text-destructive">กรุณาระบุรายละเอียดเมื่อสภาพรถไม่ปกติ</div>
+                )}
               </div>
             </div>
           )}
@@ -386,7 +438,10 @@ export default function ReturnCar() {
             <Button variant="outline" onClick={() => setIsReturnDialogOpen(false)} disabled={isSubmitting}>
               ยกเลิก
             </Button>
-            <Button onClick={handleReturnCar} disabled={isSubmitting}>
+            <Button 
+              onClick={handleReturnCar} 
+              disabled={isSubmitting || (carCondition === "ไม่ปกติ" && !notes.trim())}
+            >
               {isSubmitting ? "กำลังบันทึก..." : "บันทึกการคืนรถ"}
             </Button>
           </DialogFooter>

@@ -173,6 +173,10 @@ export default function CarDetail({ params }: { params: { id: string } }) {
           </div>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => router.push(`/admin/cars/${car.id}/maintenance`)}>
+            <Wrench className="mr-2 h-4 w-4" />
+            ซ่อมบำรุง
+          </Button>
           <Button variant="outline" size="sm" onClick={() => router.push(`/admin/cars/${car.id}/edit`)}>
             <Pencil className="mr-2 h-4 w-4" />
             แก้ไข
@@ -191,12 +195,7 @@ export default function CarDetail({ params }: { params: { id: string } }) {
         >
           {car.status}
         </Badge>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="gap-1">
-            <Wrench className="h-4 w-4" />
-            <span>บันทึกการซ่อมบำรุง</span>
-          </Button>
-        </div>
+
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -265,26 +264,14 @@ export default function CarDetail({ params }: { params: { id: string } }) {
               </div>
             </div>
 
-            <Separator />
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <div className="text-sm text-muted-foreground mb-1">วันที่ซ่อมบำรุงล่าสุด</div>
-                <div className="font-medium">{formatDate(car.lastService)}</div>
-              </div>
-              <div>
-                <div className="text-sm text-muted-foreground mb-1">วันที่ซ่อมบำรุงครั้งถัดไป</div>
-                <div className="font-medium">{formatDate(car.nextService)}</div>
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>
 
       <Tabs defaultValue="bookings" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="w-full grid grid-cols-2">
+        <TabsList className="w-full">
           <TabsTrigger value="bookings">ประวัติการจอง</TabsTrigger>
-          <TabsTrigger value="maintenance">ประวัติการซ่อมบำรุง</TabsTrigger>
         </TabsList>
 
         <TabsContent value="bookings" className="space-y-4 mt-4">
@@ -341,18 +328,7 @@ export default function CarDetail({ params }: { params: { id: string } }) {
           )}
         </TabsContent>
 
-        <TabsContent value="maintenance" className="space-y-4 mt-4">
-          <Card>
-            <CardContent className="py-10 text-center">
-              <Wrench className="h-10 w-10 text-muted-foreground/50 mx-auto mb-3" />
-              <p className="text-muted-foreground">ไม่มีประวัติการซ่อมบำรุงสำหรับรถคันนี้</p>
-              <Button variant="outline" className="mt-4">
-                <Wrench className="mr-2 h-4 w-4" />
-                เพิ่มประวัติการซ่อมบำรุง
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
+
       </Tabs>
 
       {/* Dialog ยืนยันการลบรถ */}

@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react"
 import { useParams } from "next/navigation"
 import html2canvas from "html2canvas"
 import { ImageIcon, FileDown, Map } from "lucide-react"
-import QRCode from "qrcode.react"
+import { QRCodeSVG as QRCode } from "qrcode.react"
 
 interface BusinessCard {
   id: number | null

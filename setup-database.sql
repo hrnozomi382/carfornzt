@@ -95,6 +95,24 @@ CREATE TABLE IF NOT EXISTS business_cards (
   FOREIGN KEY (userId) REFERENCES Users(id)
 );
 
+-- สร้างตาราง Maintenance
+CREATE TABLE IF NOT EXISTS Maintenance (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  carId INT NOT NULL,
+  serviceDate DATE NOT NULL,
+  serviceType VARCHAR(100) NOT NULL,
+  description TEXT,
+  cost DECIMAL(10,2) DEFAULT 0,
+  mileage INT DEFAULT 0,
+  nextServiceDate DATE,
+  nextServiceMileage INT,
+  createdBy INT,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (carId) REFERENCES Cars(id) ON DELETE CASCADE,
+  FOREIGN KEY (createdBy) REFERENCES Users(id) ON DELETE SET NULL
+);
+
 -- เพิ่มข้อมูลตัวอย่าง - ผู้ใช้งาน
 INSERT INTO Users (name, email, password, role, department, phone) VALUES
 ('ผู้ดูแลระบบ', 'admin@example.com', '$2b$10$1234567890123456789012uQiXTJ7xwKv9Yh5hAGRM0YKS1t1Jnm6', 'admin', 'IT', '0812345678'),

@@ -3,10 +3,11 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Menu, X, User, LogOut, Car, FileText } from "lucide-react"
+import { Menu, X, User, LogOut, Car, FileText, ClipboardCheck, CheckCircle, ChevronDown } from "lucide-react"
 
 export default function UserNavbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [qaDropdownOpen, setQaDropdownOpen] = useState(false)
   const router = useRouter()
 
   const handleLogout = async () => {
@@ -66,6 +67,33 @@ export default function UserNavbar() {
             >
               นามบัตร
             </Link>
+            <div className="relative">
+              <button
+                onClick={() => setQaDropdownOpen(!qaDropdownOpen)}
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 flex items-center"
+              >
+                QA
+                <ChevronDown className="h-4 w-4 ml-1" />
+              </button>
+              {qaDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                  <Link
+                    href="/user/qa-inspection"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={() => setQaDropdownOpen(false)}
+                  >
+                    ตรวจเช็คเครื่องมือ
+                  </Link>
+                  <Link
+                    href="/user/qa-inspection/approve"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={() => setQaDropdownOpen(false)}
+                  >
+                    อนุมัติการตรวจเช็ค
+                  </Link>
+                </div>
+              )}
+            </div>
             <button
               onClick={handleLogout}
               className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 flex items-center"
@@ -118,6 +146,14 @@ export default function UserNavbar() {
             >
               <FileText className="h-4 w-4 inline mr-1" />
               นามบัตร
+            </Link>
+            <Link
+              href="/user/qa"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100"
+              onClick={() => setIsOpen(false)}
+            >
+              <ClipboardCheck className="h-4 w-4 inline mr-1" />
+              QA
             </Link>
             <button
               onClick={() => {

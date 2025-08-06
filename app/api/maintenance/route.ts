@@ -1,4 +1,4 @@
-import { executeQuery } from "@/lib/db"
+import { executeQuery, executeInsert } from "@/lib/db"
 import { NextResponse } from "next/server"
 
 // GET: ดึงข้อมูลการซ่อมบำรุงทั้งหมด
@@ -46,13 +46,11 @@ export async function POST(request: Request) {
     }
 
     // เพิ่มข้อมูลการซ่อมบำรุงใหม่
-    const result = await executeQuery(
+    const insertResult = await executeInsert(
       `
       INSERT INTO Maintenance (carId, serviceDate, serviceType, description, cost, mileage, 
                               nextServiceDate, nextServiceMileage, createdBy)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
-      
-      SELECT LAST_INSERT_ID() AS id;
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
       [
         carId,
@@ -67,7 +65,7 @@ export async function POST(request: Request) {
       ],
     )
 
-    const maintenanceId = result.recordset[0].id
+    const maintenanceId = insertResult.insertId
 
     // อัปเดตข้อมูลรถ
     await executeQuery(

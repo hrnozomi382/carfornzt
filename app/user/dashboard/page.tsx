@@ -386,6 +386,8 @@ export default function UserDashboard() {
         return "bg-red-500"
       case "ยกเลิก":
         return "bg-gray-500"
+      case "รอคืนรถ":
+        return "bg-blue-500"
       default:
         return "bg-gray-500"
     }
@@ -402,6 +404,8 @@ export default function UserDashboard() {
         return "destructive"
       case "ยกเลิก":
         return "outline"
+      case "รอคืนรถ":
+        return "secondary"
       default:
         return "outline"
     }
@@ -484,6 +488,7 @@ export default function UserDashboard() {
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="default">อนุมัติแล้ว: {userBookings.filter((b) => b.status === "อนุมัติแล้ว").length}</Badge>
                   <Badge variant="secondary">รออนุมัติ: {userBookings.filter((b) => b.status === "รออนุมัติ").length}</Badge>
+                  <Badge variant="secondary">รอคืนรถ: {userBookings.filter((b) => b.status === "รอคืนรถ").length}</Badge>
                   <Badge variant="destructive">ปฏิเสธ: {userBookings.filter((b) => b.status === "ปฏิเสธ").length}</Badge>
                 </div>
               </CardContent>

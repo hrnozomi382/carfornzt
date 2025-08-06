@@ -1,0 +1,39 @@
+{
+  "name": "claude-assistant",
+  "displayName": "Claude Assistant",
+  "description": "Claude AI Assistant for VSCode",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "claude.chat",
+        "title": "Chat with Claude"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "claude.chat",
+        "key": "ctrl+shift+c",
+        "mac": "cmd+shift+c"
+      }
+    ]
+  },
+  "dependencies": {
+    "axios": "^1.11.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

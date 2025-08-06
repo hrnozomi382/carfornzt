@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Clock, ChevronLeft, MapPin, AlertCircle, RefreshCw } from "lucide-react"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { useMediaQuery } from "@/hooks/use-mobile"
 import { toast } from "@/components/ui/use-toast"
 import { Toaster } from "@/components/ui/toaster"
@@ -73,6 +76,14 @@ export default function BookingDetail() {
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false)
   const [isCancelling, setIsCancelling] = useState(false)
   const [isFixingCarStatus, setIsFixingCarStatus] = useState(false)
+  const [isReturnDialogOpen, setIsReturnDialogOpen] = useState(false)
+  const [isRequestingReturn, setIsRequestingReturn] = useState(false)
+  const [returnDetails, setReturnDetails] = useState({
+    endMileage: "",
+    carCondition: "",
+    fuelLevel: "เต็มถัง",
+    notes: ""
+  })
 
   // ดึงข้อมูลผู้ใช้
   useEffect(() => {
@@ -139,8 +150,92 @@ export default function BookingDetail() {
         return "destructive"
       case "ยกเลิก":
         return "outline"
+      case "รอคืนรถ":
+        return "secondary"
       default:
         return "outline"
+    }
+  }
+
+  // ฟังก์ชันขอคืนรถ
+  const handleRequestReturn = async () => {
+    if (!booking) return
+
+    // ตรวจสอบข้อมูลที่จำเป็น
+    if (!returnDetails.endMileage || !returnDetails.carCondition) {
+      toast({
+        title: "ข้อมูลไม่ครบถ้วน",
+        description: "กรุณากรอกเลขไมล์และสภาพรถ",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (returnDetails.carCondition === "ไม่ปกติ" && !returnDetails.notes.trim()) {
+      toast({
+        title: "ข้อมูลไม่ครบถ้วน",
+        description: "กรุณาระบุรายละเอียดเมื่อสภาพรถไม่ปกติ",
+        variant: "destructive",
+      })
+      return
+    }
+
+    const endMileageNum = Number.parseInt(returnDetails.endMileage)
+    if (isNaN(endMileageNum)) {
+      toast({
+        title: "เลขไมล์ไม่ถูกต้อง",
+        description: "กรุณาระบุเลขไมล์เป็นตัวเลข",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsRequestingReturn(true)
+
+    try {
+      const response = await fetch(`/api/bookings/${booking.id}/request-return`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          endMileage: endMileageNum,
+          carCondition: returnDetails.carCondition,
+          fuelLevel: returnDetails.fuelLevel,
+          notes: returnDetails.notes
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to request return")
+      }
+
+      const result = await response.json()
+      console.log("Request return result:", result)
+
+      // แสดงข้อความสำเร็จ
+      toast({
+        title: "ส่งคำขอคืนรถสำเร็จ",
+        description: "คำขอคืนรถของคุณถูกส่งไปยังผู้ดูแลระบบแล้ว",
+        variant: "default",
+      })
+
+      // อัปเดตสถานะการจองในหน้าปัจจุบัน
+      setBooking({
+        ...booking,
+        status: "รอคืนรถ",
+      })
+    } catch (error: any) {
+      console.error("Error requesting return:", error)
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: error.message || "ไม่สามารถส่งคำขอคืนรถได้ กรุณาลองใหม่อีกครั้ง",
+        variant: "destructive",
+      })
+    } finally {
+      setIsRequestingReturn(false)
+      setIsReturnDialogOpen(false)
     }
   }
 
@@ -403,6 +498,21 @@ export default function BookingDetail() {
               </div>
             )}
 
+            {booking.status === "อนุมัติแล้ว" && (
+              <div className="mt-6">
+                <Button className="w-full" onClick={() => setIsReturnDialogOpen(true)}>
+                  ขอคืนรถ
+                </Button>
+              </div>
+            )}
+
+            {booking.status === "รอคืนรถ" && (
+              <div className="mt-4 p-3 bg-blue-50 text-blue-700 rounded-md">
+                <p className="font-medium">รอผู้ดูแลระบบบันทึกการคืนรถ</p>
+                <p className="text-sm">คำขอคืนรถของคุณถูกส่งไปยังผู้ดูแลระบบแล้ว</p>
+              </div>
+            )}
+
             {booking.status === "ปฏิเสธ" && booking.notes && (
               <div className="mt-4 p-3 bg-destructive/10 text-destructive rounded-md">
                 <p className="font-medium">เหตุผลที่ปฏิเสธ:</p>
@@ -464,6 +574,96 @@ export default function BookingDetail() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Return Request Dialog */}
+      <AlertDialog open={isReturnDialogOpen} onOpenChange={setIsReturnDialogOpen}>
+        <AlertDialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <AlertDialogHeader>
+            <AlertDialogTitle>ขอคืนรถ</AlertDialogTitle>
+            <AlertDialogDescription>
+              กรุณากรอกรายละเอียดการคืนรถ
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          
+          {booking && (
+            <div className="space-y-4 py-4">
+              <div className="p-3 bg-muted rounded-md">
+                <div className="font-medium">{booking.car?.name || "รถที่จอง"}</div>
+                <div className="text-sm text-muted-foreground">
+                  {formatDate(booking.startDate)} - {formatDate(booking.endDate)}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="endMileage">เลขไมล์หลังใช้งาน <span className="text-destructive">*</span></Label>
+                <Input
+                  id="endMileage"
+                  placeholder="ระบุเลขไมล์"
+                  value={returnDetails.endMileage}
+                  onChange={(e) => setReturnDetails({...returnDetails, endMileage: e.target.value})}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="carCondition">สภาพรถ <span className="text-destructive">*</span></Label>
+                <select
+                  id="carCondition"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  value={returnDetails.carCondition}
+                  onChange={(e) => setReturnDetails({...returnDetails, carCondition: e.target.value})}
+                >
+                  <option value="">เลือกสภาพรถ</option>
+                  <option value="ปกติ">ปกติ</option>
+                  <option value="ไม่ปกติ">ไม่ปกติ</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="fuelLevel">ปริมาณน้ำมัน</Label>
+                <select
+                  id="fuelLevel"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  value={returnDetails.fuelLevel}
+                  onChange={(e) => setReturnDetails({...returnDetails, fuelLevel: e.target.value})}
+                >
+                  <option value="เต็มถัง">เต็มถัง</option>
+                  <option value="3/4">3/4 ถัง</option>
+                  <option value="1/2">1/2 ถัง</option>
+                  <option value="1/4">1/4 ถัง</option>
+                  <option value="ใกล้หมด">ใกล้หมด</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="notes">
+                  หมายเหตุ {returnDetails.carCondition === "ไม่ปกติ" && <span className="text-destructive">*</span>}
+                </Label>
+                <Textarea
+                  id="notes"
+                  placeholder={returnDetails.carCondition === "ไม่ปกติ" ? "กรุณาระบุรายละเอียดปัญหาหรือความเสียหาย" : "รายละเอียดเพิ่มเติม (ถ้ามี)"}
+                  value={returnDetails.notes}
+                  onChange={(e) => setReturnDetails({...returnDetails, notes: e.target.value})}
+                  rows={3}
+                  className={returnDetails.carCondition === "ไม่ปกติ" && !returnDetails.notes ? "border-destructive" : ""}
+                />
+                {returnDetails.carCondition === "ไม่ปกติ" && !returnDetails.notes && (
+                  <div className="text-sm text-destructive">กรุณาระบุรายละเอียดเมื่อสภาพรถไม่ปกติ</div>
+                )}
+              </div>
+            </div>
+          )}
+          
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isRequestingReturn}>ยกเลิก</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleRequestReturn}
+              disabled={isRequestingReturn || (returnDetails.carCondition === "ไม่ปกติ" && !returnDetails.notes.trim())}
+            >
+              {isRequestingReturn ? "กำลังส่งคำขอ..." : "ส่งคำขอคืนรถ"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Cancel Booking Dialog */}
       <AlertDialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
